@@ -1,10 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { notificationService } from "../api/services";
+import { useRef } from "react";
+import { Client } from "@stomp/stompjs";
+import { useAuth } from "./AuthContext";
+
 
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
-
+    const { user } = useAuth();
+    const token = localStorage.getItem('token');
+    const clientRef = useRef(null); // for storing client state for WebSocket
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +21,43 @@ export const NotificationProvider = ({ children }) => {
     useEffect(() => { // runs only when being mounted
         fetchUnreadCount();
     }, []);
+
+    useEffect(() => {
+         // WebSocket connection triggers when user state changes
+        if (!user) return; // if user is null do nothing
+
+        const connect = () => {
+            const client = new Client({
+                brokerURL: "ws://localhost:8080/ws",
+                reconnectDelay: 5000,
+                connectHeaders: {
+                    Authorization : `Bearer ${token}`
+                },
+                onConnect: () => {
+                    console.log('Connected!'); 
+                    client.subscribe("/user/queue/notifications",
+                        (message) => {
+                            const notification = JSON.parse(message.body);
+                            addNotification(notification);
+                    })
+                 }
+            }); // making a client object for connection
+            
+            clientRef.current = client; // storing that client in a Reference so its not lost upon re-render
+            client.activate();
+
+        };
+
+        connect(); // calling the connect method
+
+        return () => {
+            clientRef.current?.deactivate();
+            clientRef.current = null;
+        }
+
+        
+    },[user])
+
 
         const fetchNotifications = async () => { // for first page of notifications
             if (isLoading) return; // dont process uncessary request,if one request is still Loading
@@ -75,8 +118,9 @@ export const NotificationProvider = ({ children }) => {
         
     }
     
-    const addNotification =  () => {
-        
+    const addNotification = (notification) => {
+        setNotifications(prev => [notification, ...prev]);
+        setUnreadCount(prev => prev + 1);
     }
 
     const resetNotifications = () => {

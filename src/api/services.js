@@ -67,4 +67,6 @@ export const notificationService = {
       .get("/notifications", { params: { limit, cursor } })
       .then((res) => res.data),
   markAllAsRead: () => api.patch("/notifications/read-all"),
+  getUnreadNotificationCount: () =>
+    api.get("/notifications/unread-count").then((res) => res.data),
 };

@@ -5,11 +5,15 @@ import { Client } from "@stomp/stompjs";
 import { useAuth } from "./AuthContext";
 
 
+const getWebSocketUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+    return apiUrl.replace(/^http/, 'ws').replace(/\/api\/?$/, '/ws');
+};
+
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
     const { user } = useAuth();
-    const token = localStorage.getItem('token');
     const clientRef = useRef(null); // for storing client state for WebSocket
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -19,8 +23,16 @@ export const NotificationProvider = ({ children }) => {
     const PAGE_SIZE = 10;
 
     useEffect(() => { // runs only when being mounted
+        if (!user) {
+            setNotifications([]);
+            setUnreadCount(0);
+            setHasMore(true);
+            setCursor(null);
+            return;
+        }
+
         fetchUnreadCount();
-    }, []);
+    }, [user]);
 
     useEffect(() => {
          // WebSocket connection triggers when user state changes
@@ -28,17 +40,46 @@ export const NotificationProvider = ({ children }) => {
 
         const connect = () => {
             const client = new Client({
-                brokerURL: "ws://localhost:8080/ws",
+                brokerURL: getWebSocketUrl(),
                 reconnectDelay: 5000,
-                connectHeaders: {
-                    Authorization : `Bearer ${token}`
+                beforeConnect: () => {
+                    const currentToken = localStorage.getItem('token');
+                    client.connectHeaders = {
+                        Authorization: `Bearer ${currentToken}`
+                    };
                 },
                 onConnect: () => {
                     console.log('Connected!'); 
                     client.subscribe("/user/queue/notifications",
                         (message) => {
+                            console.log("WEBSOCKET MSG RECEIVED!");
                             const notification = JSON.parse(message.body);
                             addNotification(notification);
+                            
+                            const senderName = notification.creatorName || 'Someone';
+                            let actionText = 'interacted with your content.';
+                            switch (notification.notificationType) {
+                                case 'POST_COMMENT': actionText = 'commented on your post.'; break;
+                                case 'POST_LIKE': actionText = 'liked your post.'; break;
+                                case 'COMMENT_REPLY': actionText = 'replied to your comment.'; break;
+                            }
+                            let linkTo = null;
+                            if (notification.postId) {
+                                linkTo = `/post/${notification.postId}`;
+                                if (notification.commentId) {
+                                    linkTo += `#comment-${notification.commentId}`;
+                                }
+                            }
+                            
+                            window.dispatchEvent(new CustomEvent('app-toast', {
+                                detail: {
+                                    title: 'New Notification',
+                                    message: `${senderName} ${actionText}`,
+                                    type: 'info',
+                                    duration: 6000,
+                                    linkTo: linkTo
+                                }
+                            }));
                     })
                  }
             }); // making a client object for connection
@@ -65,7 +106,7 @@ export const NotificationProvider = ({ children }) => {
             setIsLoading(true);
 
             try {
-                const { data } = await notificationService.getNotifications(PAGE_SIZE,null); // first page cursor is null
+                const  data  = await notificationService.getNotifications(PAGE_SIZE,null); // first page cursor is null
                     setNotifications(data.list);        
                     setHasMore(data.hasMore);
                     setCursor(data.cursor);
@@ -87,7 +128,7 @@ export const NotificationProvider = ({ children }) => {
         setIsLoading(true);
 
         try {
-            const { data } = await notificationService.getNotifications(PAGE_SIZE, cursor);
+            const data  = await notificationService.getNotifications(PAGE_SIZE, cursor);
             setNotifications(prev => [...prev, ...data.list]);
             setCursor(data.cursor);
             setHasMore(data.hasMore);
@@ -105,7 +146,7 @@ export const NotificationProvider = ({ children }) => {
     const fetchUnreadCount = async () => {
 
         try {
-            const { data } = await notificationService.getUnreadNotificationCount();
+            const  data  = await notificationService.getUnreadNotificationCount();
             setUnreadCount(data);
         } catch (error) {
             console.error(error);
@@ -114,8 +155,21 @@ export const NotificationProvider = ({ children }) => {
 
     }
 
-    const markAllAsRead = () => {
-        
+    const markAllAsRead = async () => {
+        const previousUnreadCount = unreadCount;
+
+        setUnreadCount(0);
+
+        try {
+            await notificationService.markAllAsRead();
+            setNotifications(prev => prev.map(notification => ({
+                ...notification,read:true
+            })))
+        }
+        catch (error) {
+            setUnreadCount(previousUnreadCount);
+        }
+
     }
     
     const addNotification = (notification) => {
@@ -130,7 +184,7 @@ export const NotificationProvider = ({ children }) => {
         setCursor(null);    
     }
 
-    return (<NotificationContext.Provider value={{ notifications, unreadCount, isLoading, hasMore, cursor , fetchNotifications,loadMore,markAllAsRead,addNotification,resetNotifications}}>
+    return (<NotificationContext.Provider value={{ notifications, unreadCount, isLoading, hasMore, cursor , fetchNotifications,loadMore,markAllAsRead,addNotification,resetNotifications,fetchUnreadCount}}>
         {children}
     </NotificationContext.Provider>)
 

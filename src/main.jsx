@@ -6,15 +6,18 @@ import { ThemeProvider } from './context/ThemeContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import './style.css'
 import App from './App.jsx'
+import { NotificationProvider } from './context/NotificationContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <GoogleOAuthProvider clientId="450258133865-irr7v1o53jss1dptndhoma703j8ea0hm.apps.googleusercontent.com">
         <AuthProvider>
+          <NotificationProvider>
           <ThemeProvider>
             <App />
-          </ThemeProvider>
+            </ThemeProvider>
+            </NotificationProvider>
         </AuthProvider>
       </GoogleOAuthProvider>
     </BrowserRouter>

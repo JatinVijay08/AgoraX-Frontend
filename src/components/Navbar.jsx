@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import LogoutModal from './LogoutModal';
+import NotificationBell from './notifications/NotificationBell';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -59,6 +60,8 @@ export default function Navbar() {
                   Create Post
                 </Link>
 
+                <NotificationBell />
+
                 <Link
                   to="/profile"
                   className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-surface-high/40 transition-colors duration-200"
@@ -108,7 +111,8 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="flex md:hidden items-center">
+          <div className="flex md:hidden items-center gap-2">
+            {user && <NotificationBell />}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 -mr-2 text-on-surface hover:text-primary transition-colors cursor-pointer"

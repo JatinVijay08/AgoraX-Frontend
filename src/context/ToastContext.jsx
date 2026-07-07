@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ToastContext = createContext(null);
 
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
 
-    const addToast = useCallback((message, type = 'info', duration = 5000, title = null, details = null) => {
+    const addToast = useCallback((message, type = 'info', duration = 5000, title = null, details = null, linkTo = null) => {
         const id = Math.random().toString(36).substr(2, 9);
-        setToasts((prev) => [...prev, { id, message, type, duration, title, details }]);
+        setToasts((prev) => [...prev, { id, message, type, duration, title, details, linkTo }]);
         return id;
     }, []);
 
@@ -17,8 +18,8 @@ export const ToastProvider = ({ children }) => {
 
     useEffect(() => {
         const handleGlobalToast = (event) => {
-            const { message, type, duration, title, details } = event.detail;
-            addToast(message, type, duration, title, details);
+            const { message, type, duration, title, details, linkTo } = event.detail;
+            addToast(message, type, duration, title, details, linkTo);
         };
         window.addEventListener('app-toast', handleGlobalToast);
         return () => window.removeEventListener('app-toast', handleGlobalToast);
@@ -27,7 +28,7 @@ export const ToastProvider = ({ children }) => {
     return (
         <ToastContext.Provider value={{ addToast, removeToast }}>
             {children}
-            <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none w-full max-w-sm">
+            <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col items-center gap-3 pointer-events-none w-full max-w-sm">
                 {toasts.map((toast) => (
                     <ToastItem key={toast.id} {...toast} onRemove={() => removeToast(toast.id)} />
                 ))}
@@ -36,7 +37,8 @@ export const ToastProvider = ({ children }) => {
     );
 };
 
-const ToastItem = ({ message, type, duration, title, details, onRemove }) => {
+const ToastItem = ({ message, type, duration, title, details, linkTo, onRemove }) => {
+    const navigate = useNavigate();
     useEffect(() => {
         const displayDuration = details ? Math.max(duration || 5000, 7000) : (duration || 5000);
         const timer = setTimeout(onRemove, displayDuration);
@@ -59,15 +61,24 @@ const ToastItem = ({ message, type, duration, title, details, onRemove }) => {
 
     const c = colors[type] || colors.info;
 
+    const handleClick = () => {
+        if (linkTo) {
+            navigate(linkTo);
+            onRemove();
+        }
+    };
+
     return (
         <div
-            className="pointer-events-auto flex items-start gap-3 p-4 ghost-border"
+            className={`pointer-events-auto flex items-start gap-3 p-4 ghost-border ${linkTo ? 'cursor-pointer hover:bg-surface-high/50 transition-colors' : ''}`}
             style={{
                 background: c.bg,
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 borderRadius: '1rem',
+                width: '100%',
             }}
+            onClick={handleClick}
         >
             <span className="material-symbols-outlined text-[20px] shrink-0 mt-0.5" style={{ color: c.icon }}>{icons[type] || 'info'}</span>
             <div className="flex-1 min-w-0">

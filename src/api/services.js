@@ -7,10 +7,26 @@ export const authService = {
 };
 
 export const postService = {
-  getAllPosts: (sort = "new", limit = 10, cursor = null) =>
-    api
-      .get("/posts", { params: { sort, limit, cursor } })
-      .then((res) => res.data),
+  getAllPosts: (sort = "new", limit = 10, cursor = null, page = 0) => {
+    const params = { sort, limit };
+    if (sort === "new" && cursor) params.cursor = cursor;
+    else if (sort !== "new") params.page = page;
+
+    return api.get("/posts", { params }).then((res) => {
+      const data = res.data;
+      if (Array.isArray(data)) {
+        return { posts: data, nextCursor: null, hasMore: false };
+      } else if (data.content) {
+        return { posts: data.content, nextCursor: null, hasMore: !data.last };
+      } else {
+        return {
+          posts: data.posts || [],
+          nextCursor: data.nextCursor || null,
+          hasMore: data.hasMore || false,
+        };
+      }
+    });
+  },
   getPostById: (id) => api.get(`/posts/${id}`).then((res) => res.data),
   createPost: (title, content, mediaFile) => {
     const formData = new FormData();

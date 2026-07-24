@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import { postService } from '../api/services';
 
 export function usePosts() {
     const [posts, setPosts] = useState([]);
@@ -16,30 +16,12 @@ export function usePosts() {
         else { setLoadingMore(true); }
 
         try {
-            const params = { sort: activeTab, limit: 10 };
-            if (activeTab === 'new') {
-                if (isLoadMore && currentCursor) params.cursor = currentCursor;
-            } else {
-                params.page = isLoadMore ? page + 1 : 0;
-            }
+            const fetchPage = isLoadMore ? page + 1 : 0;
+            const data = await postService.getAllPosts(activeTab, 10, currentCursor, fetchPage);
 
-            const response = await api.get('/posts', { params });
-            const data = response.data;
-
-            let fetchedPosts = [];
-            let nextCursorResult = null;
-            let hasMoreResult = false;
-
-            if (Array.isArray(data)) {
-                fetchedPosts = data;
-            } else if (data.content) {
-                fetchedPosts = data.content;
-                hasMoreResult = !data.last;
-            } else {
-                fetchedPosts = data.posts || [];
-                nextCursorResult = data.nextCursor || null;
-                hasMoreResult = data.hasMore || false;
-            }
+            const fetchedPosts = data.posts || [];
+            const nextCursorResult = data.nextCursor || null;
+            const hasMoreResult = data.hasMore || false;
 
             if (isLoadMore) {
                 setPosts(prev => {

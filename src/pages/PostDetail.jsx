@@ -5,6 +5,7 @@ import PostCard from '../components/PostCard';
 import CommentItem from '../components/CommentItem';
 import { useAuth } from '../context/AuthContext';
 import { timeAgo } from '../utils/timeAgo';
+import { useComments } from '../hooks/useComments';
 
 export default function PostDetail() {
     const { id } = useParams();
@@ -12,17 +13,25 @@ export default function PostDetail() {
     const { user } = useAuth();
 
     const [post, setPost] = useState(null);
-    const [comments, setComments] = useState([]);
     const [replyingTo, setReplyingTo] = useState(null);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
-    const [loadingComments, setLoadingComments] = useState(true);
     const [showComments, setShowComments] = useState(true);
     const [showAddCommentForm, setShowAddCommentForm] = useState(false);
 
-    useEffect(() => { fetchPost(); if (showComments) fetchComments(0); }, [id]);
+    const { 
+        comments, 
+        currentPage, 
+        totalPages, 
+        loadingComments, 
+        fetchComments, 
+        handlePageChange 
+    } = useComments(id);
+
+    useEffect(() => { 
+        fetchPost(); 
+        if (showComments) fetchComments(0); 
+    }, [id, showComments, fetchComments]);
 
     const fetchPost = async () => {
         try { setPost(await postService.getPostById(id)); }
@@ -30,30 +39,11 @@ export default function PostDetail() {
         finally { setLoading(false); }
     };
 
-    const fetchComments = async (page = currentPage) => {
-        try {
-            setLoadingComments(true);
-            const data = await commentService.getCommentsByPostId(id, page, 50);
-            const flatComments = data.content || [];
-            const commentMap = {};
-            const rootComments = [];
-            flatComments.forEach(c => { c.replies = []; commentMap[c.id] = c; });
-            flatComments.forEach(c => {
-                if (c.parentComment && c.parentComment !== 'null' && c.parentComment !== 0) {
-                    const parent = commentMap[c.parentComment];
-                    if (parent) parent.replies.push(c);
-                    else rootComments.push(c);
-                } else rootComments.push(c);
-            });
-            setComments(rootComments);
-            setTotalPages(data.totalPages || 0);
-            setCurrentPage(data.number || page);
-        } catch (error) { console.error("Failed to load comments", error); setComments([]); }
-        finally { setLoadingComments(false); }
+    const handleCommentToggle = () => { 
+        const next = !showComments; 
+        setShowComments(next); 
+        if (next && comments.length === 0) fetchComments(0); 
     };
-
-    const handlePageChange = (newPage) => { if (newPage >= 0 && newPage < totalPages) fetchComments(newPage); };
-    const handleCommentToggle = () => { const next = !showComments; setShowComments(next); if (next && comments.length === 0) fetchComments(0); };
 
     const handleCommentSubmit = async (e, parentId = null) => {
         e?.preventDefault();

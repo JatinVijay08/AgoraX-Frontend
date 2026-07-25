@@ -87,8 +87,8 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
         e.stopPropagation();
         const url = `${window.location.origin}/post/${post.id}`;
         const shareData = {
-            title: `Discussion Forum: ${post.title}`,
-            text: post.content?.slice(0, 100) + '...',
+            title: `AgoraX: ${post.title}`,
+            text: `Check out this discussion on AgoraX`,
             url: url,
         };
 

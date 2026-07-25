@@ -41,10 +41,10 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[16px] text-canvas">album</span>
+              <span className="material-symbols-outlined text-[16px] text-canvas">account_balance</span>
             </div>
-            <span className="text-[18px] font-[800] text-on-surface tracking-tight">
-              Discussion Forum
+            <span className="text-[20px] font-[800] text-on-surface tracking-tight" style={{ fontFamily: 'var(--font-cinzel)' }}>
+              AgoraX
             </span>
           </Link>
 
@@ -100,9 +100,9 @@ export default function Navbar() {
                     </Link>
                     <Link
                       to="/register"
-                      className="btn-primary btn-pill cta-glow px-5 py-2 text-[13px]"
+                      className="btn-primary rounded-sm cta-glow px-5 py-2 text-[13px] font-[800]"
                     >
-                      Join Forum
+                      Become a Citizen
                     </Link>
                   </>
                 )}
@@ -165,9 +165,9 @@ export default function Navbar() {
                     <Link
                       to="/register"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex justify-center py-4 btn-primary btn-pill cta-glow text-[15px]"
+                      className="w-full flex justify-center py-4 btn-primary rounded-sm cta-glow text-[15px] font-[800]"
                     >
-                      Join Forum
+                      Become a Citizen
                     </Link>
                   </div>
                 )}

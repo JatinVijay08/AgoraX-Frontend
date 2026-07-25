@@ -58,11 +58,11 @@ export default function Home() {
                     <div className="w-full min-w-0">
                         {/* Hero headline */}
                         <div className="mb-12">
-                            <h1 className="text-[2.5rem] md:text-[3.5rem] font-[800] tracking-[-0.04em] leading-[0.9] mb-3 gradient-text-animate pb-2">
-                                Recent<br />Discussions
+                            <h1 className="text-[2rem] md:text-[2.5rem] font-[800] text-on-surface tracking-tight" style={{ fontFamily: 'var(--font-cinzel)' }}>
+                                The Public Square
                             </h1>
-                            <p className="text-[1.125rem] text-on-surface-variant leading-[1.7] max-w-[400px]">
-                                Join and start discussions with the community.
+                            <p className="text-on-surface-variant text-[15px] max-w-lg mt-2">
+                                Welcome to AgoraX. Discuss the ideas that matter.
                             </p>
                         </div>
 
@@ -73,11 +73,12 @@ export default function Home() {
                                     <button
                                         key={tab.key}
                                         onClick={() => setActiveTab(tab.key)}
-                                        className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-[12px] font-[800] uppercase tracking-[0.1em] transition-all duration-200 cursor-pointer ${
+                                        className={`flex items-center gap-2 px-4 sm:px-5 py-2 text-[12px] font-[800] uppercase tracking-[0.15em] transition-all duration-200 cursor-pointer border ${
                                             activeTab === tab.key
-                                                ? 'bg-primary/10 text-primary'
-                                                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-high/40'
+                                                ? 'border-primary bg-primary/10 text-primary'
+                                                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-high/40'
                                         }`}
+                                        style={{ borderRadius: '4px' }}
                                     >
                                         <span className={`material-symbols-outlined text-[16px] ${activeTab === tab.key ? 'filled pulse-accent' : ''}`}>
                                             {tab.icon}
@@ -145,8 +146,9 @@ export default function Home() {
                         <RecentUsersWidget />
 
                         {/* Footer */}
-                        <div className="label-meta text-outline-variant px-1 space-y-3">
-                            <p className="text-[10px] opacity-60">© 2026 Discussion Forum</p>
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <p className="text-[10px] opacity-60">© 2026 AgoraX</p>
+                            <div className="flex items-center gap-6"></div>
                         </div>
                         </div>
                     </div>

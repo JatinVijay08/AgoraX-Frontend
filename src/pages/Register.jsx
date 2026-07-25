@@ -14,6 +14,7 @@ export default function Register() {
 
     useEffect(() => {
         if (!success) {
+            // Form entrance
             anime({
                 targets: '.anime-item',
                 translateY: [20, 0],
@@ -21,6 +22,18 @@ export default function Register() {
                 duration: 800,
                 delay: anime.stagger(100),
                 easing: 'easeOutExpo'
+            });
+
+            // Ambient background drift
+            anime({
+                targets: '.anime-bg',
+                translateX: () => anime.random(-50, 50),
+                translateY: () => anime.random(-50, 50),
+                scale: [1, 1.1, 1],
+                duration: 10000,
+                easing: 'easeInOutSine',
+                direction: 'alternate',
+                loop: true
             });
         }
     }, [success]);
@@ -54,8 +67,7 @@ export default function Register() {
         setLoading(true);
         try {
             await authService.register({ username: formData.username, email: formData.email, password: formData.password });
-            setSuccess('Account created! Redirecting to login...');
-            setTimeout(() => navigate('/login'), 2000);
+            setSuccess('Your citizenship has been registered.');
         } catch {
             // Handled by global interceptor
         } finally {
@@ -64,10 +76,13 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[#0b1326] relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-[#07101a] relative overflow-hidden">
             {/* Ambient Background Glows */}
-            <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
-            <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="anime-bg absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="anime-bg absolute bottom-1/4 right-1/4 w-96 h-96 bg-tertiary-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+            {/* Greek Meander / Key pattern overlay (subtle) */}
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h60v60H0z\' fill=\'none\'/%3E%3Cpath d=\'M15 15h30v30H15z\' stroke=\'%23ffffff\' stroke-width=\'1\' fill=\'none\'/%3E%3Cpath d=\'M25 25h10v10H25z\' stroke=\'%23ffffff\' stroke-width=\'1\' fill=\'none\'/%3E%3C/svg%3E")' }}></div>
 
             {/* Top Right Navigation */}
             <div className="absolute top-8 right-8 z-50">
@@ -81,25 +96,38 @@ export default function Register() {
             <div ref={containerRef} className="w-full max-w-[420px] p-4 sm:p-6 z-10 mt-12 sm:mt-0">
                 <div className="w-full">
                     {success ? (
-                        <div className="text-center py-16 animate-in fade-in duration-300">
+                        <div className="text-center py-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
                                 <span className="material-symbols-outlined text-primary text-[32px]">check_circle</span>
                             </div>
-                            <h2 className="text-[1.5rem] font-[800] text-white tracking-tight mb-2">Welcome to Discussion Forum</h2>
-                            <p className="text-on-surface-variant text-[14px] font-[500]">{success}</p>
+                            <h2 className="text-[1.5rem] font-[800] text-white tracking-tight mb-2" style={{ fontFamily: 'var(--font-cinzel)' }}>Welcome to AgoraX</h2>
+                            <p className="text-on-surface-variant text-[14px] font-[500] mb-8">{success}</p>
+                            
+                            <button
+                                onClick={() => navigate('/login')}
+                                className="w-full py-3.5 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-sm cta-glow transform hover:-translate-y-0.5 duration-200 cursor-pointer"
+                            >
+                                Proceed to Sign In
+                            </button>
                         </div>
                     ) : (
                         <>
-                            <div className="flex flex-col items-center text-center mb-6 anime-item">
-                                <h1 className="text-[2.25rem] font-[800] text-white tracking-tight mb-1">Create Account</h1>
-                                <p className="text-[14px] font-[500] text-on-surface-variant">Join to start a discussion</p>
+                            <div className="flex flex-col items-center text-center mb-8 anime-item">
+                                <span className="material-symbols-outlined text-[48px] text-primary mb-4">account_balance</span>
+                                <h2 className="text-[2.25rem] font-[800] text-white tracking-tight mb-4" style={{ fontFamily: 'var(--font-cinzel)' }}>Join AgoraX</h2>
+                                
+                                <div className="w-full p-4 border-l-2 border-primary/40 bg-primary/5 text-left rounded-sm backdrop-blur-sm">
+                                    <p className="text-on-surface-variant text-[13px] leading-relaxed">
+                                        <strong className="text-primary font-[700]">Agora</strong> <em>(n.)</em> In ancient Athens, the heart of public life. A marketplace of ideas where citizens gathered to debate, share stories, and govern.
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Social Logins */}
                             <div className="mb-5 flex justify-center w-full anime-item">
                                 <button 
                                     type="button"
-                                    className="relative w-full h-[48px] rounded-xl overflow-hidden bg-surface-low border border-white/5 hover:bg-surface-high/50 transition-colors group cursor-pointer"
+                                    className="relative w-full h-[48px] rounded-sm overflow-hidden bg-surface-low border border-white/5 hover:bg-surface-high/50 transition-colors group cursor-pointer"
                                     onClick={handleGoogleRedirectClick}
                                 >
                                     <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
@@ -127,7 +155,7 @@ export default function Register() {
                                     <label className="text-[9px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-1.5 px-1">Display Name</label>
                                     <input
                                         type="text"
-                                        className="w-full px-5 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                        className="w-full px-5 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] rounded-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                         placeholder="Your alias"
                                         value={formData.username}
                                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -138,8 +166,8 @@ export default function Register() {
                                     <label className="text-[9px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-1.5 px-1">Email Address</label>
                                     <input
                                         type="email"
-                                        className="w-full px-5 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
-                                        placeholder="name@discussion-forum.com"
+                                        className="w-full px-5 py-3 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] rounded-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                        placeholder="citizen@agorax.com"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     />
@@ -151,7 +179,7 @@ export default function Register() {
                                         <div className="relative">
                                             <input
                                                 type={showPassword ? "text" : "password"}
-                                                className="w-full px-4 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] font-mono tracking-widest rounded-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                                 placeholder="••••••••"
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -169,7 +197,7 @@ export default function Register() {
                                         <div className="relative">
                                             <input
                                                 type={showConfirmPassword ? "text" : "password"}
-                                                className="w-full px-4 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] font-mono tracking-widest rounded-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                                 placeholder="••••••••"
                                                 value={formData.confirmPassword}
                                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
@@ -187,7 +215,7 @@ export default function Register() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className={`w-full py-3 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-xl cta-glow transform hover:-translate-y-0.5 duration-200 mt-2 cursor-pointer anime-item ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    className={`w-full py-3 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-sm cta-glow transform hover:-translate-y-0.5 duration-200 mt-2 cursor-pointer anime-item ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
                                     {loading ? 'Creating Account...' : 'Create Account'}
                                 </button>

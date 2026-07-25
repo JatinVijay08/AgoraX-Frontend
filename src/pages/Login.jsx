@@ -13,6 +13,7 @@ export default function Login() {
     const containerRef = useRef(null);
 
     useEffect(() => {
+        // Form entrance
         anime({
             targets: '.anime-item',
             translateY: [20, 0],
@@ -20,6 +21,18 @@ export default function Login() {
             duration: 800,
             delay: anime.stagger(100),
             easing: 'easeOutExpo'
+        });
+
+        // Ambient background drift
+        anime({
+            targets: '.anime-bg',
+            translateX: () => anime.random(-50, 50),
+            translateY: () => anime.random(-50, 50),
+            scale: [1, 1.1, 1],
+            duration: 10000,
+            easing: 'easeInOutSine',
+            direction: 'alternate',
+            loop: true
         });
     }, []);
 
@@ -53,10 +66,13 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[#0b1326] relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-[#07101a] relative overflow-hidden">
             {/* Ambient Background Glows */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="anime-bg absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="anime-bg absolute bottom-1/4 right-1/4 w-96 h-96 bg-tertiary-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+            {/* Greek Meander / Key pattern overlay (subtle) */}
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h60v60H0z\' fill=\'none\'/%3E%3Cpath d=\'M15 15h30v30H15z\' stroke=\'%23ffffff\' stroke-width=\'1\' fill=\'none\'/%3E%3Cpath d=\'M25 25h10v10H25z\' stroke=\'%23ffffff\' stroke-width=\'1\' fill=\'none\'/%3E%3C/svg%3E")' }}></div>
 
             {/* Top Right Navigation */}
             <div className="absolute top-8 right-8 z-50">
@@ -69,15 +85,21 @@ export default function Login() {
             {/* Centered Auth Card */}
             <div ref={containerRef} className="w-full max-w-[420px] p-6 sm:p-8 z-10">
                 <div className="flex flex-col items-center text-center mb-8 anime-item">
-                    <h1 className="text-[2.25rem] font-[800] text-white tracking-tight mb-1">Welcome</h1>
-                    <p className="text-[14px] font-[500] text-on-surface-variant">Sign in to continue</p>
+                    <span className="material-symbols-outlined text-[48px] text-primary mb-4">account_balance</span>
+                    <h1 className="text-[2.5rem] font-[800] text-white tracking-tight mb-4" style={{ fontFamily: 'var(--font-cinzel)' }}>AgoraX</h1>
+                    
+                    <div className="w-full p-4 border-l-2 border-primary/40 bg-primary/5 text-left rounded-sm backdrop-blur-sm">
+                        <p className="text-on-surface-variant text-[13px] leading-relaxed">
+                            <strong className="text-primary font-[700]">Agora</strong> <em>(n.)</em> In ancient Athens, the heart of public life. A marketplace of ideas where citizens gathered to debate, share stories, and govern.
+                        </p>
+                    </div>
                 </div>
 
                 {/* Social Logins */}
                 <div className="mb-6 flex justify-center w-full anime-item">
                     <button 
                         type="button"
-                        className="relative w-full h-[52px] rounded-xl overflow-hidden bg-surface-low border border-white/5 hover:bg-surface-high/50 transition-colors group cursor-pointer"
+                        className="relative w-full h-[52px] rounded-sm overflow-hidden bg-surface-low border border-white/5 hover:bg-surface-high/50 transition-colors group cursor-pointer"
                         onClick={handleGoogleRedirectClick}
                     >
                         <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
@@ -105,8 +127,8 @@ export default function Login() {
                         <label className="text-[10px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-2 px-1">Email Address</label>
                         <input
                             type="email"
-                            className="w-full px-5 py-3 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
-                            placeholder="name@discussion-forum.com"
+                            className="w-full px-5 py-3 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] rounded-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                            placeholder="citizen@agorax.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
@@ -117,7 +139,7 @@ export default function Login() {
                         <div className="relative">
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className="w-full px-5 py-3 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                className="w-full px-5 py-3 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] font-mono tracking-widest rounded-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                 placeholder="••••••••"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -134,7 +156,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-3.5 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-xl cta-glow transform hover:-translate-y-0.5 duration-200 mt-2 cursor-pointer anime-item ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`w-full py-3.5 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-sm cta-glow transform hover:-translate-y-0.5 duration-200 mt-2 cursor-pointer anime-item ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {loading ? 'Signing In...' : 'Sign In'}
                     </button>

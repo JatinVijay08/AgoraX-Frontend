@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import RecentUsersWidget from '../components/RecentUsersWidget';
 
 import { usePosts } from '../hooks/usePosts';
 
 export default function Home() {
+    const navigate = useNavigate();
     const { 
         posts, loading, loadingMore, error, hasMore, 
         activeTab, setActiveTab, handleLoadMore 
@@ -15,6 +17,24 @@ export default function Home() {
         { key: 'trending', label: 'Trending', icon: 'trending_up' },
         { key: 'new', label: 'New', icon: 'schedule' },
     ];
+
+    const observer = useRef();
+    const lastPostElementRef = useCallback(node => {
+        if (loadingMore) return;
+        if (observer.current) observer.current.disconnect();
+        
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                handleLoadMore();
+            }
+        }, {
+            root: null,
+            rootMargin: '200px',
+            threshold: 0
+        });
+        
+        if (node) observer.current.observe(node);
+    }, [loadingMore, hasMore, handleLoadMore]);
 
     if (loading) {
         return (
@@ -68,7 +88,7 @@ export default function Home() {
                             </div>
                             
                             <button
-                                onClick={() => window.location.href = '/create'}
+                                onClick={() => navigate('/create')}
                                 className="btn-primary btn-pill cta-glow flex items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-[700] cursor-pointer"
                             >
                                 <span className="material-symbols-outlined text-[18px]">add</span>
@@ -96,21 +116,16 @@ export default function Home() {
                                         <PostCard key={`feed-${post.id}`} post={post} />
                                     ))}
 
-                                    {/* Load More */}
-                                    <div className="pt-8 flex justify-start">
-                                        {hasMore ? (
-                                            <button
-                                                onClick={handleLoadMore}
-                                                disabled={loadingMore}
-                                                className="btn-secondary btn-pill flex items-center gap-3 px-8 py-3 text-[13px] disabled:opacity-50 cursor-pointer"
-                                            >
-                                                {loadingMore ? (
-                                                    <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
-                                                ) : (
-                                                    <span className="material-symbols-outlined text-[18px]">expand_more</span>
-                                                )}
-                                                {loadingMore ? 'Loading...' : 'Load More'}
-                                            </button>
+                                    {/* Infinite Scroll Trigger & Load More Status */}
+                                    <div className="pt-8 flex justify-center pb-8" ref={lastPostElementRef}>
+                                        {loadingMore ? (
+                                            <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-surface-high/50 text-[13px] text-on-surface-variant">
+                                                <span className="material-symbols-outlined text-[18px] animate-spin text-primary">progress_activity</span>
+                                                Loading...
+                                            </div>
+                                        ) : hasMore ? (
+                                            // Invisible target for observer when not loading
+                                            <div className="h-10 w-full" />
                                         ) : posts.length > 0 ? (
                                             <div className="flex items-center gap-3 px-6 py-3 rounded-full text-[12px] font-[700] text-on-surface-variant uppercase tracking-[0.1em]"
                                                  style={{ background: '#131b2e' }}>

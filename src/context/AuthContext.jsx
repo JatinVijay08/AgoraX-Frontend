@@ -94,8 +94,12 @@ export const AuthProvider = ({ children }) => {
         navigate('/login');
     };
 
+    const updateUser = (updates) => {
+        setUser(prev => prev ? { ...prev, ...updates } : prev);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading, isAuthModalOpen, openAuthModal, closeAuthModal }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUser, loading, isAuthModalOpen, openAuthModal, closeAuthModal }}>
             {!loading && children}
         </AuthContext.Provider>
     );

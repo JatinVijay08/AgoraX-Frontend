@@ -5,7 +5,8 @@ import { timeAgo } from '../utils/timeAgo';
 import { useAuth } from '../context/AuthContext';
 
 export default function Profile() {
-    const { user: authUser } = useAuth();
+    const { user: authUser, updateUser } = useAuth();
+    const [activeTooltip, setActiveTooltip] = useState(null);
 
     const [user, setUser] = useState(null);
     const [loadingUser, setLoadingUser] = useState(true);
@@ -66,8 +67,8 @@ export default function Profile() {
             const updated = await userService.updateUsername(newUsername.trim());
             setUser(updated); setEditingUsername(false);
             localStorage.setItem('username', updated.username);
+            updateUser({ username: updated.username });
             showToast(`Username updated to "${updated.username}"`);
-            setTimeout(() => window.location.reload(), 1200);
         } catch (err) { setUsernameError(err?.response?.data?.message || 'Username already taken.'); }
         finally { setUsernameLoading(false); }
     };
@@ -113,7 +114,7 @@ export default function Profile() {
                                         value={newUsername}
                                         onChange={e => { setNewUsername(e.target.value); setUsernameError(''); }}
                                         onKeyDown={e => { if (e.key === 'Enter') requestUsernameChange(); if (e.key === 'Escape') cancelEditing(); }}
-                                        className="obsidian-input px-4 py-2 text-[1.5rem] font-[700] w-64"
+                                        className="obsidian-input px-4 py-2 text-[1.5rem] font-[700] w-full sm:w-64"
                                         style={{ borderRadius: '0.75rem' }}
                                         maxLength={30}
                                         placeholder="New username"
@@ -163,9 +164,9 @@ export default function Profile() {
                     <p className="text-[1.25rem] sm:text-[1.5rem] font-[800] text-on-surface mb-1">{user?.postCount || 0}</p>
                     <p className="label-meta text-[9px] text-primary flex items-center justify-center gap-1">
                         Posts
-                        <span className="relative group cursor-default">
+                        <span className="relative group cursor-pointer" onClick={() => setActiveTooltip(activeTooltip === 'posts' ? null : 'posts')}>
                             <span className="text-outline-variant text-[9px] ghost-border rounded-full w-3 h-3 flex items-center justify-center font-[800] leading-none hover:text-on-surface-variant transition-colors">?</span>
-                            <span className="absolute bottom-full left-0 mb-2 w-48 px-3 py-2 rounded-xl text-[10px] text-on-surface-variant leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left normal-case tracking-normal" style={{ background: '#2d3449', boxShadow: '0 20px 50px rgba(13, 15, 38, 0.6)' }}>
+                            <span className={`absolute bottom-full left-0 mb-2 w-48 px-3 py-2 rounded-xl text-[10px] text-on-surface-variant leading-relaxed transition-opacity pointer-events-none z-50 text-left normal-case tracking-normal ${activeTooltip === 'posts' ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'}`} style={{ background: '#2d3449', boxShadow: '0 20px 50px rgba(13, 15, 38, 0.6)' }}>
                                 <span className="text-primary font-[700]">Posts</span> — Discussions you've started.
                             </span>
                         </span>
@@ -175,9 +176,9 @@ export default function Profile() {
                     <p className="text-[1.25rem] sm:text-[1.5rem] font-[800] text-tertiary-gold mb-1 pulse-accent">{user?.karma || 0}</p>
                     <p className="label-meta text-[9px] text-tertiary-gold flex items-center justify-center gap-1">
                         Karma
-                        <span className="relative group cursor-default">
+                        <span className="relative group cursor-pointer" onClick={() => setActiveTooltip(activeTooltip === 'karma' ? null : 'karma')}>
                             <span className="text-outline-variant text-[9px] ghost-border rounded-full w-3 h-3 flex items-center justify-center font-[800] leading-none hover:text-on-surface-variant transition-colors">?</span>
-                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 px-3 py-2 rounded-xl text-[10px] text-on-surface-variant leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left normal-case tracking-normal" style={{ background: '#2d3449', boxShadow: '0 20px 50px rgba(13, 15, 38, 0.6)' }}>
+                            <span className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 px-3 py-2 rounded-xl text-[10px] text-on-surface-variant leading-relaxed transition-opacity pointer-events-none z-50 text-left normal-case tracking-normal ${activeTooltip === 'karma' ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'}`} style={{ background: '#2d3449', boxShadow: '0 20px 50px rgba(13, 15, 38, 0.6)' }}>
                                 <span className="text-tertiary-gold font-[700]">Karma</span> — Your reputation score. Upvotes add, downvotes subtract.
                             </span>
                         </span>
@@ -187,9 +188,9 @@ export default function Profile() {
                     <p className="text-[1.25rem] sm:text-[1.5rem] font-[800] text-on-surface mb-1">{user?.commentCount || 0}</p>
                     <p className="label-meta text-[9px] text-primary-container flex items-center justify-center gap-1">
                         Comments
-                        <span className="relative group cursor-default">
+                        <span className="relative group cursor-pointer" onClick={() => setActiveTooltip(activeTooltip === 'comments' ? null : 'comments')}>
                             <span className="text-outline-variant text-[9px] ghost-border rounded-full w-3 h-3 flex items-center justify-center font-[800] leading-none hover:text-on-surface-variant transition-colors">?</span>
-                            <span className="absolute bottom-full right-0 mb-2 w-48 px-3 py-2 rounded-xl text-[10px] text-on-surface-variant leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left normal-case tracking-normal" style={{ background: '#2d3449', boxShadow: '0 20px 50px rgba(13, 15, 38, 0.6)' }}>
+                            <span className={`absolute bottom-full right-0 mb-2 w-48 px-3 py-2 rounded-xl text-[10px] text-on-surface-variant leading-relaxed transition-opacity pointer-events-none z-50 text-left normal-case tracking-normal ${activeTooltip === 'comments' ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'}`} style={{ background: '#2d3449', boxShadow: '0 20px 50px rgba(13, 15, 38, 0.6)' }}>
                                 <span className="text-primary-container font-[700]">Comments</span> — Replies across your posts.
                             </span>
                         </span>

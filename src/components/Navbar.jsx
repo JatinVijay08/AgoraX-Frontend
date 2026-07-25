@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+
 import LogoutModal from './LogoutModal';
 import NotificationBell from './notifications/NotificationBell';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);

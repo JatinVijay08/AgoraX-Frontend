@@ -4,7 +4,6 @@ import { postService, commentService } from '../api/services';
 import PostCard from '../components/PostCard';
 import CommentItem from '../components/CommentItem';
 import { useAuth } from '../context/AuthContext';
-import { timeAgo } from '../utils/timeAgo';
 import { useComments } from '../hooks/useComments';
 
 export default function PostDetail() {
@@ -35,7 +34,7 @@ export default function PostDetail() {
 
     const fetchPost = async () => {
         try { setPost(await postService.getPostById(id)); }
-        catch (error) { console.error("Failed to load post", error); }
+        catch { console.error("Failed to load post"); }
         finally { setLoading(false); }
     };
 
@@ -49,7 +48,7 @@ export default function PostDetail() {
         e?.preventDefault();
         if (!newComment.trim()) return;
         try { await commentService.addComment(id, newComment, parentId); setNewComment(''); setReplyingTo(null); fetchComments(0); fetchPost(); }
-        catch (error) { /* handled globally */ }
+        catch { /* handled globally */ }
     };
 
 

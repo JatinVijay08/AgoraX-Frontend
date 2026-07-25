@@ -33,7 +33,7 @@ export default function Login() {
             const response = await authService.login(formData);
             login(response.data);
             navigate('/');
-        } catch (error) {
+        } catch {
             // Handled by global interceptor
         } finally {
             setLoading(false);

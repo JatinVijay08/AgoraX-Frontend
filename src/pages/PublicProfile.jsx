@@ -35,14 +35,14 @@ export default function PublicProfile() {
             const data = await userService.getUserProfile(username);
             setUser(data);
             setPostsLoaded(true);
-        } catch (err) { setError('Failed to load profile.'); }
+        } catch { setError('Failed to load profile.'); }
         finally { setLoadingUser(false); }
     };
 
     const fetchUserPosts = async () => {
         setLoadingPosts(true);
         try { setPosts(await userService.getUserProfilePosts(username, postSort)); }
-        catch (err) { console.error('Failed to fetch user posts', err); }
+        catch (error) { console.error('Failed to fetch user posts', error); }
         finally { setLoadingPosts(false); }
     };
 

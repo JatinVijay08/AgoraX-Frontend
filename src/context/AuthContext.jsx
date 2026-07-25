@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
             window.dispatchEvent(new CustomEvent('app-toast', { 
                 detail: { message: `Welcome ${username || decoded.username || decoded.sub || 'User'}!`, type: 'success' } 
             }));
-        } catch (error) {
+        } catch {
             console.error("Login failed: Invalid token received");
             // Handle error appropriately, maybe clear token if invalid
         }

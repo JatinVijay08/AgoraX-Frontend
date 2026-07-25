@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+
 import { authService } from '../api/services';
 import { GoogleLogin } from '@react-oauth/google';
 
 export default function Register() {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
     const navigate = useNavigate();
-    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -44,7 +43,7 @@ export default function Register() {
             await authService.register({ username: formData.username, email: formData.email, password: formData.password });
             setSuccess('Account created! Redirecting to login...');
             setTimeout(() => navigate('/login'), 2000);
-        } catch (error) {
+        } catch {
             // Handled by global interceptor
         } finally {
             setLoading(false);

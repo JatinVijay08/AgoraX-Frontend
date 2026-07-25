@@ -110,8 +110,8 @@ export const NotificationProvider = ({ children }) => {
                     setNotifications(data.list);        
                     setHasMore(data.hasMore);
                     setCursor(data.cursor);
-            } catch (error) {
-                console.error(error);
+            } catch {
+                // Already handled by interceptor
             }
             finally {
                 setIsLoading(false);
@@ -132,10 +132,8 @@ export const NotificationProvider = ({ children }) => {
             setNotifications(prev => [...prev, ...data.list]);
             setCursor(data.cursor);
             setHasMore(data.hasMore);
-        }
-        catch (error) {
-            console.error(error);
-            
+        } catch {
+            console.error("Failed to load more notifications");
         }
         finally {
             setIsLoading(false);
@@ -148,8 +146,8 @@ export const NotificationProvider = ({ children }) => {
         try {
             const  data  = await notificationService.getUnreadNotificationCount();
             setUnreadCount(data);
-        } catch (error) {
-            console.error(error);
+        } catch {
+            console.error("Failed to fetch unread count");
         }
         
 
@@ -166,7 +164,7 @@ export const NotificationProvider = ({ children }) => {
                 ...notification,read:true
             })))
         }
-        catch (error) {
+        catch {
             setUnreadCount(previousUnreadCount);
         }
 

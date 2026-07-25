@@ -46,8 +46,8 @@ export default function CreatePost() {
         try {
             await postService.createPost(title, content, mediaFile);
             navigate('/');
-        } catch (err) {
-            // Handled globally
+        } catch {
+            window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Failed to create post', type: 'error' } }));
         } finally {
             setLoading(false);
         }

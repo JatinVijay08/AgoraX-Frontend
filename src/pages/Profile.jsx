@@ -5,7 +5,7 @@ import { timeAgo } from '../utils/timeAgo';
 import { useAuth } from '../context/AuthContext';
 
 export default function Profile() {
-    const { user: authUser, login } = useAuth();
+    const { user: authUser } = useAuth();
 
     const [user, setUser] = useState(null);
     const [loadingUser, setLoadingUser] = useState(true);
@@ -39,14 +39,14 @@ export default function Profile() {
             setNewUsername(data.username || authUser?.username || '');
             fetchUserPosts();
             setPostsLoaded(true);
-        } catch (err) { setError('Failed to load profile.'); }
+        } catch { setError('Failed to load profile.'); }
         finally { setLoadingUser(false); }
     };
 
     const fetchUserPosts = async () => {
         setLoadingPosts(true);
         try { setPosts(await userService.getUserPosts(postSort)); }
-        catch (err) { console.error('Failed to fetch user posts', err); }
+        catch (error) { console.error('Failed to fetch user posts', error); }
         finally { setLoadingPosts(false); }
     };
 
@@ -76,7 +76,7 @@ export default function Profile() {
         if (!postToDelete) return;
         setDeleteError('');
         try { await userService.deleteUserPost(postToDelete); setPosts(prev => prev.filter(p => p.id !== postToDelete)); setPostToDelete(null); showToast('Post removed.'); }
-        catch (err) { setDeleteError('Failed to delete post.'); setPostToDelete(null); }
+        catch { setDeleteError('Failed to delete post.'); setPostToDelete(null); }
     };
 
     // Stats are now fetched from backend via UserProfileResponse

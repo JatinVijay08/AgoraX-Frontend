@@ -29,6 +29,7 @@ export default function PostDetail() {
     } = useComments(id);
 
     useEffect(() => { 
+        window.scrollTo(0, 0);
         fetchPost(); 
         if (showComments) fetchComments(0); 
     }, [id, showComments, fetchComments]);

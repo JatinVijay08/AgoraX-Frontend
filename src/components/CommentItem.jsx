@@ -33,20 +33,38 @@ export default function CommentItem({
 
     const handleVote = async (e, type) => {
         e.stopPropagation();
+        const previousComment = { ...localComment };
+        
+        let newVoteCount = localComment.voteCount || 0;
+        let newVoteType = type;
+
+        if (localComment.voteType === type) {
+            newVoteType = null;
+            newVoteCount += (type === 'downvote' ? 1 : -1);
+        } else {
+            if (localComment.voteType) {
+                newVoteCount += (type === 'upvote' ? 2 : -2);
+            } else {
+                newVoteCount += (type === 'upvote' ? 1 : -1);
+            }
+        }
+        setLocalComment(prev => ({ ...prev, voteType: newVoteType, voteCount: newVoteCount }));
+
         try {
             const updated = await commentService.voteOnComment(localComment.id, type);
-            let newVoteType = updated.voteType;
-            if (newVoteType === 'null' || newVoteType === undefined) newVoteType = null;
+            let updatedVoteType = updated.voteType;
+            if (updatedVoteType === 'null' || updatedVoteType === undefined) updatedVoteType = null;
             setLocalComment(prev => ({ 
                 ...prev, 
                 ...updated, 
-                voteType: newVoteType, 
+                voteType: updatedVoteType, 
                 voteCount: updated.voteCount ?? prev.voteCount, 
                 replies: prev.replies, 
                 username: prev.username 
             }));
         } catch (error) { 
             console.error("Vote failed", error); 
+            setLocalComment(previousComment);
         }
     };
 

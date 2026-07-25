@@ -17,6 +17,7 @@ export default function CreatePost() {
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime'];
 
     const handleFile = (file) => {
+        setIsDragOver(false);
         if (!file) return;
         if (!ALLOWED_TYPES.includes(file.type)) {
             window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Unsupported file type', type: 'warning' } }));
@@ -144,10 +145,15 @@ export default function CreatePost() {
                         <button
                             onClick={handleSubmit}
                             disabled={loading || !title.trim() || !content.trim()}
-                            className={`w-full py-3.5 btn-primary text-[15px] cursor-pointer ${loading || !title.trim() || !content.trim() ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            className={`w-full py-3.5 btn-primary text-[15px] cursor-pointer flex items-center justify-center gap-2 ${loading || !title.trim() || !content.trim() ? 'opacity-40 cursor-not-allowed' : ''}`}
                             style={{ borderRadius: '0.75rem' }}
                         >
-                            {loading ? 'Saving...' : 'Create Post'}
+                            {loading ? (
+                                <>
+                                    <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                                    Saving...
+                                </>
+                            ) : 'Create Post'}
                         </button>
                         <button onClick={() => navigate('/')} className="w-full py-3 btn-ghost text-[14px] font-[600] cursor-pointer" style={{ borderRadius: '0.75rem' }}>
                             Discard

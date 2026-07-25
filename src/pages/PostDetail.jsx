@@ -17,6 +17,7 @@ export default function PostDetail() {
     const [loading, setLoading] = useState(true);
     const [showComments, setShowComments] = useState(true);
     const [showAddCommentForm, setShowAddCommentForm] = useState(false);
+    const [submittingComment, setSubmittingComment] = useState(false);
 
     const { 
         comments, 
@@ -46,9 +47,11 @@ export default function PostDetail() {
 
     const handleCommentSubmit = async (e, parentId = null) => {
         e?.preventDefault();
-        if (!newComment.trim()) return;
+        if (!newComment.trim() || submittingComment) return;
+        setSubmittingComment(true);
         try { await commentService.addComment(id, newComment, parentId); setNewComment(''); setReplyingTo(null); fetchComments(0); fetchPost(); }
         catch { /* handled globally */ }
+        finally { setSubmittingComment(false); }
     };
 
 
@@ -101,10 +104,14 @@ export default function PostDetail() {
                                     <div className="flex justify-end gap-3">
                                         <button type="button" onClick={() => setShowAddCommentForm(false)}
                                             className="btn-ghost px-5 py-2.5 text-[13px] font-[600] cursor-pointer" style={{ borderRadius: '0.5rem' }}>Cancel</button>
-                                        <button type="submit" disabled={!newComment.trim()}
-                                            className={`btn-primary btn-pill px-6 py-2.5 text-[13px] flex items-center gap-2 ${!newComment.trim() ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
-                                            <span className="material-symbols-outlined text-[16px]">send</span>
-                                            Publish
+                                        <button type="submit" disabled={!newComment.trim() || submittingComment}
+                                            className={`btn-primary btn-pill px-6 py-2.5 text-[13px] flex items-center gap-2 ${(!newComment.trim() || submittingComment) ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+                                            {submittingComment ? (
+                                                <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                                            ) : (
+                                                <span className="material-symbols-outlined text-[16px]">send</span>
+                                            )}
+                                            {submittingComment ? 'Publishing...' : 'Publish'}
                                         </button>
                                     </div>
                                 </form>

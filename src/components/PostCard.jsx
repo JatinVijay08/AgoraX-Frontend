@@ -16,11 +16,35 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
 
     const handleVote = async (e, type) => {
         e.stopPropagation();
+        if (!authUser) {
+            openAuthModal();
+            return;
+        }
+
+        const previousPost = { ...post };
+        
+        // Optimistic update
+        let newVoteCount = post.voteCount || 0;
+        let newUserVote = type;
+
+        if (post.userVote === type) {
+            newUserVote = null;
+            newVoteCount += (type === 'downvote' ? 1 : -1);
+        } else {
+            if (post.userVote) {
+                newVoteCount += (type === 'upvote' ? 2 : -2);
+            } else {
+                newVoteCount += (type === 'upvote' ? 1 : -1);
+            }
+        }
+        setPost({ ...post, userVote: newUserVote, voteCount: newVoteCount });
+
         try {
             const updatedPost = await postService.vote(post.id, type);
             setPost(updatedPost);
         } catch (error) {
             console.error("Vote failed", error);
+            setPost(previousPost); // Revert on failure
         }
     };
 

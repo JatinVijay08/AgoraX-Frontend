@@ -1,57 +1,48 @@
-# Discussion Forum Frontend (Exhale) 🎨
+# AgoraX - The Public Square (Frontend)
 
-A sleek, responsive, and modern web application built with **React** and **Vite**, serving as the interface for the high-performance Discussion Forum platform.
+The visually stunning, highly interactive React frontend for **AgoraX**. Built with modern web technologies, it features a bespoke "Athenian Night" aesthetic inspired by the ancient Greek marketplace of ideas.
 
-## 🌟 Key Features
-- **Modern UI/UX:** Designed with a premium "Glassmorphism" aesthetic, featuring smooth transitions and dark-mode elegance.
-- **Real-time Authentication:** Integrated with **JWT** and **Google OAuth2** for seamless user onboarding.
-- **Social Interaction:** Full support for creating posts, nested commenting, and a voting system (upvote/downvote).
-- **Asynchronous Media Support:** Integrated with **Cloudinary** for lightning-fast media uploads and processing.
-- **Full Responsiveness:** Optimized for everything from mobile devices to ultra-wide desktop monitors.
-- **Dynamic Routing:** Built with **React Router** for efficient, single-page application navigation.
+## 🚀 Tech Stack
 
-## 🛠️ Tech Stack
-- **Framework:** React 18
-- **Build Tool:** Vite
-- **Styling:** CSS (Modern Flex/Grid system with Glassmorphism)
-- **State Management:** Context API
-- **Icons:** Material Symbols (Google)
-- **deployment:** Vercel
+- **Framework**: React.js with Vite
+- **Styling**: Tailwind CSS (Custom Design System)
+- **Animations**: Anime.js (Micro-interactions, ambient glows)
+- **Routing**: React Router DOM
+- **State Management**: Context API
+- **HTTP Client**: Axios (with global interceptors)
+- **Icons & Typography**: Google Material Symbols, Google Fonts (`Cinzel`, `Inter`)
 
-## 🚀 Getting Started
+## ✨ Core Features
+
+- **Athenian Night Aesthetic**: A unique, premium dark-mode UI with Aegean Navy backgrounds, Greek Gold accents, and subtle classical patterns.
+- **Cinematic Typography**: Uses the monumental `Cinzel` serif font for a historical, epic feel, paired with modern sans-serifs for readability.
+- **Dynamic Micro-Interactions**: Hover effects, smooth page transitions, and drifting ambient background glows powered by Anime.js.
+- **Rich Media**: Markdown support for post creation and Cloudinary integration for image uploads.
+- **Real-Time UX**: Toast notification system for immediate feedback on user actions (like upvoting or commenting).
+- **Responsive Design**: Fully optimized for mobile, tablet, and desktop viewing.
+
+## 🛠️ Local Development Setup
 
 ### Prerequisites
-- Node.js 18+
+- Node.js (v18+ recommended)
 - npm or yarn
 
 ### Environment Variables
-Create a `.env` file in the root directory:
-```bash
-VITE_API_BASE_URL=https://your-backend-api.render.com
-VITE_GOOGLE_CLIENT_ID=your-google-client-id
-```
+Currently, the frontend uses hardcoded backend URLs pointing to `localhost:8080` (or dynamic relative paths in production). If you plan to deploy, ensure you update the Axios base URL in `api.js` or configure environment variables accordingly.
 
-### Setup & Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/JatinVijay08/discussion-forum-frontend.git
-   ```
+*(Note: The Google OAuth Client ID is intentionally public and safely embedded in the authentication components.)*
+
+### Running the App
+1. Clone the repository and navigate to the frontend directory.
 2. Install dependencies:
    ```bash
    npm install
    ```
-3. Run in development mode:
+3. Start the Vite development server:
    ```bash
    npm run dev
    ```
-4. Build for production:
-   ```bash
-   npm run build
-   ```
+The application will be available at `http://localhost:5173`.
 
----
-
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
-
-**Contact:** Jatin Vijayvargiya - [Connect on LinkedIn](https://www.linkedin.com/in/jatin-vijayvargiya-jatinv08/)
+## 🎨 Design Philosophy
+AgoraX avoids generic "vibecoding" by embracing a cohesive theme. Every component—from the sharpened "Become a Citizen" buttons to the `account_balance` temple logo—is designed to make the user feel like they are participating in a grand public assembly.

@@ -10,6 +10,7 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
     const { user: authUser, openAuthModal } = useAuth();
     const [post, setPost] = React.useState(initialPost);
     const [shared, setShared] = React.useState(false);
+    const [isImageModalOpen, setIsImageModalOpen] = React.useState(false);
     const cardRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -186,8 +187,12 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
                         <img
                             src={post.mediaUrl}
                             alt="Post media"
-                            className="w-full max-h-[450px] object-contain img-hover"
+                            className={`w-full max-h-[450px] object-contain img-hover ${isDetail ? 'cursor-zoom-in' : ''}`}
                             loading="lazy"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (isDetail) setIsImageModalOpen(true);
+                            }}
                         />
                     )}
                 </div>
@@ -252,6 +257,27 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
                     <span className="hidden sm:inline">{shared ? 'Link Copied' : 'Share'}</span>
                 </button>
             </div>
+
+            {/* Fullscreen Image Modal */}
+            {isImageModalOpen && isDetail && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-[#07101A]/95 backdrop-blur-md p-4 animate-in fade-in duration-200"
+                    onClick={(e) => { e.stopPropagation(); setIsImageModalOpen(false); }}
+                >
+                    <button 
+                        className="absolute top-4 right-4 md:top-6 md:right-6 text-white/50 hover:text-white p-2 transition-all cursor-pointer z-[110]"
+                        onClick={(e) => { e.stopPropagation(); setIsImageModalOpen(false); }}
+                    >
+                        <span className="material-symbols-outlined text-[28px] md:text-[36px]">close</span>
+                    </button>
+                    <img 
+                        src={post.mediaUrl} 
+                        alt="Full screen media" 
+                        className="max-w-full max-h-full object-contain cursor-zoom-out shadow-2xl rounded-sm"
+                        onClick={(e) => { e.stopPropagation(); setIsImageModalOpen(false); }}
+                    />
+                </div>
+            )}
         </div>
     );
 };

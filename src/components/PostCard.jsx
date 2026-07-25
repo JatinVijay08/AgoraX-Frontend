@@ -3,16 +3,31 @@ import { postService } from '../api/services';
 import { useNavigate } from 'react-router-dom';
 import { timeAgo } from '../utils/timeAgo';
 import { useAuth } from '../context/AuthContext';
+import anime from 'animejs/lib/anime.es.js';
 
-const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDelete = false, onDelete }) => {
+const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDelete = false, onDelete, index = 0 }) => {
     const navigate = useNavigate();
     const { user: authUser, openAuthModal } = useAuth();
     const [post, setPost] = React.useState(initialPost);
     const [shared, setShared] = React.useState(false);
+    const cardRef = React.useRef(null);
 
     React.useEffect(() => {
         setPost(initialPost);
     }, [initialPost]);
+
+    React.useEffect(() => {
+        if (!isDetail && cardRef.current) {
+            anime({
+                targets: cardRef.current,
+                translateY: [40, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: (index % 10) * 100,
+                easing: 'easeOutExpo'
+            });
+        }
+    }, [isDetail, index]);
 
     const handleVote = async (e, type) => {
         e.stopPropagation();
@@ -38,6 +53,22 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
             }
         }
         setPost({ ...post, userVote: newUserVote, voteCount: newVoteCount });
+
+        // Subtle pop on the specific button
+        anime({
+            targets: `.vote-btn-${post.id}-${type}`,
+            scale: [1, 1.2, 1],
+            duration: 400,
+            easing: 'easeOutQuad'
+        });
+        
+        // Subtle shift on the pill
+        anime({
+            targets: `.vote-pill-${post.id}`,
+            translateY: type === 'upvote' ? [0, -3, 0] : [0, 3, 0],
+            duration: 400,
+            easing: 'easeOutQuad'
+        });
 
         try {
             const updatedPost = await postService.vote(post.id, type);
@@ -82,9 +113,10 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
 
     return (
         <div
+            ref={cardRef}
             onClick={goToDetail}
-            className={`card-l2 p-6 transition-all duration-200 relative group ${
-                isDetail ? 'cursor-default' : 'hover-glow cursor-pointer'
+            className={`card-l2 p-6 transition-all duration-200 relative group opacity-0 ${
+                isDetail ? 'cursor-default opacity-100' : 'hover-glow cursor-pointer'
             }`}
             style={{ borderRadius: '1.5rem' }}
         >
@@ -164,10 +196,10 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
             {/* Footer actions */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-auto">
                 {/* Vote pill */}
-                <div className="vote-pill px-1 py-1 flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+                <div className={`vote-pill vote-pill-${post.id} px-1 py-1 flex items-center gap-0.5`} onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={(e) => handleVote(e, 'upvote')}
-                        className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 ${
+                        className={`vote-btn-${post.id}-upvote w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 ${
                             post.userVote === 'upvote' 
                             ? 'text-white bg-[#818cf8] ring-2 ring-[#818cf8]/50 shadow-[0_0_20px_rgba(129,140,248,0.5)]' 
                             : 'text-on-surface-variant hover:text-[#818cf8] hover:bg-[#818cf8]/10'
@@ -183,7 +215,7 @@ const PostCard = ({ post: initialPost, isDetail = false, onCommentClick, showDel
                     </span>
                     <button
                         onClick={(e) => handleVote(e, 'downvote')}
-                        className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 ${
+                        className={`vote-btn-${post.id}-downvote w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 ${
                             post.userVote === 'downvote' 
                             ? 'text-white bg-[#ff5252] ring-2 ring-[#ff5252]/50 shadow-[0_0_20px_rgba(255,82,82,0.5)]' 
                             : 'text-on-surface-variant hover:text-[#ff5252] hover:bg-[#ff5252]/10'

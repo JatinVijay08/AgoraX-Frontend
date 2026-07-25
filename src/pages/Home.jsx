@@ -112,8 +112,8 @@ export default function Home() {
                                 </div>
                             ) : (
                                 <>
-                                    {posts.map(post => (
-                                        <PostCard key={`feed-${post.id}`} post={post} />
+                                    {posts.map((post, index) => (
+                                        <PostCard key={`feed-${post.id}`} post={post} index={index} />
                                     ))}
 
                                     {/* Infinite Scroll Trigger & Load More Status */}

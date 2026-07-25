@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
 import { authService } from '../api/services';
-import { GoogleLogin } from '@react-oauth/google';
+import anime from 'animejs/lib/anime.es.js';
 
 export default function Register() {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
@@ -11,6 +10,20 @@ export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [success, setSuccess] = useState('');
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (!success) {
+            anime({
+                targets: '.anime-item',
+                translateY: [20, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: anime.stagger(100),
+                easing: 'easeOutExpo'
+            });
+        }
+    }, [success]);
 
     const handleGoogleRedirectClick = () => {
         const clientId = '450258133865-irr7v1o53jss1dptndhoma703j8ea0hm.apps.googleusercontent.com';
@@ -51,70 +64,22 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen w-full flex bg-[#0b1326]">
-            {/* Left Pane - Editorial Banner */}
-            <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 overflow-hidden border-r border-white/5">
-                {/* Background Image */}
-                <div 
-                    className="absolute inset-0 z-0 bg-cover bg-center"
-                    style={{ 
-                        backgroundImage: "url('/discussion-forum-hero.png')",
-                        filter: "brightness(0.9) contrast(1.1) hue-rotate(10deg)" 
-                    }}
-                >
-                    <div className="absolute inset-0 bg-gradient-to-r from-canvas/80 via-transparent to-canvas/40" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-canvas via-transparent to-transparent opacity-80" />
-                </div>
+        <div className="min-h-screen w-full flex items-center justify-center bg-[#0b1326] relative overflow-hidden">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-                {/* Top Logo */}
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-primary flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[16px] text-canvas">album</span>
-                    </div>
-                    <span className="text-[20px] font-[800] text-white tracking-tight">Discussion Forum</span>
-                </div>
-
-                {/* Glassmorphic Motivation Card */}
-                <div className="relative z-10 w-full max-w-[480px] p-10 rounded-3xl glass ghost-border shadow-2xl backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <h2 className="text-[2.25rem] font-[800] text-white leading-[1.1] mb-5 tracking-tight">
-                        Join the community.
-                    </h2>
-                    <p className="text-[1.05rem] text-on-surface-variant leading-[1.6] font-[500]">
-                        Create an account to start sharing and discussing ideas.
-                    </p>
-                </div>
-
-                {/* Bottom Label */}
-                <div className="relative z-10">
-                    <p className="label-meta text-[9px] tracking-[0.2em] text-on-surface-variant mb-1">DISCUSSION FORUM</p>
-                    <p className="text-[14px] text-white/80 font-[500]">Community Platform</p>
-                </div>
+            {/* Top Right Navigation */}
+            <div className="absolute top-8 right-8 z-50">
+                <Link to="/explore" className="text-on-surface-variant hover:text-white transition-colors text-[13px] font-[600] tracking-wide flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 hover:bg-white/10 backdrop-blur-md">
+                    <span className="material-symbols-outlined text-[16px]">explore</span>
+                    Browse
+                </Link>
             </div>
 
-            {/* Right Pane - Auth Form */}
-            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 relative min-h-screen overflow-y-auto">
-                
-                {/* Mobile/Auth Header */}
-                <div className="absolute top-0 left-0 w-full flex items-center justify-between p-6 sm:p-8 z-50">
-                    {/* Mobile Logo Fallback */}
-                    <div className="lg:hidden flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-primary flex items-center justify-center">
-                            <span className="material-symbols-outlined text-[16px] text-canvas">album</span>
-                        </div>
-                        <span className="text-[18px] font-[800] text-white tracking-tight">Discussion Forum</span>
-                    </div>
-
-                    <div className="hidden lg:block"></div>
-
-                    {/* Browse Discussions Link */}
-                    <Link to="/explore" className="flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-[700] text-on-surface-variant hover:text-white transition-colors border border-outline-variant/30 hover:bg-surface-high/30 z-50">
-                        <span className="material-symbols-outlined text-[16px]">travel_explore</span>
-                        <span className="hidden sm:inline">Browse Posts</span>
-                        <span className="sm:hidden">Explore</span>
-                    </Link>
-                </div>
-
-                <div className="w-full max-w-[400px] mt-24 lg:mt-0">
+            {/* Centered Auth Card */}
+            <div ref={containerRef} className="w-full max-w-[420px] p-4 sm:p-6 z-10 mt-12 sm:mt-0">
+                <div className="w-full">
                     {success ? (
                         <div className="text-center py-16 animate-in fade-in duration-300">
                             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
@@ -125,18 +90,20 @@ export default function Register() {
                         </div>
                     ) : (
                         <>
-                            <h1 className="text-[2rem] font-[800] text-white tracking-tight mb-2">Join the Network</h1>
-                            <p className="text-[15px] font-[500] text-on-surface-variant mb-10">Sign up to start a discussion</p>
+                            <div className="flex flex-col items-center text-center mb-6 anime-item">
+                                <h1 className="text-[2.25rem] font-[800] text-white tracking-tight mb-1">Create Account</h1>
+                                <p className="text-[14px] font-[500] text-on-surface-variant">Join to start a discussion</p>
+                            </div>
 
                             {/* Social Logins */}
-                            <div className="mb-10 flex justify-center w-full">
+                            <div className="mb-5 flex justify-center w-full anime-item">
                                 <button 
                                     type="button"
-                                    className="relative w-full h-[52px] rounded-xl overflow-hidden bg-surface-low border border-white/5 hover:bg-surface-high/50 transition-colors group cursor-pointer"
+                                    className="relative w-full h-[48px] rounded-xl overflow-hidden bg-surface-low border border-white/5 hover:bg-surface-high/50 transition-colors group cursor-pointer"
                                     onClick={handleGoogleRedirectClick}
                                 >
                                     <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
-                                        <svg width="20" height="20" viewBox="0 0 48 48">
+                                        <svg width="18" height="18" viewBox="0 0 48 48">
                                             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                                             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
                                             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
@@ -148,68 +115,68 @@ export default function Register() {
                             </div>
 
                             {/* Divider */}
-                            <div className="flex items-center gap-4 mb-10">
-                                <div className="flex-1 h-px bg-outline-variant/30"></div>
-                                <span className="text-[10px] font-[800] tracking-[0.15em] text-outline-variant uppercase">Or Register With Email</span>
-                                <div className="flex-1 h-px bg-outline-variant/30"></div>
+                            <div className="flex items-center gap-4 mb-5 anime-item">
+                                <div className="flex-1 h-px bg-white/5"></div>
+                                <span className="text-[10px] font-[800] tracking-[0.15em] text-white/30 uppercase">Or Register</span>
+                                <div className="flex-1 h-px bg-white/5"></div>
                             </div>
 
                             {/* Form */}
-                            <form onSubmit={handleSubmit} className="space-y-5">
-                                <div>
-                                    <label className="text-[10px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-2 px-1">Display Name</label>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="anime-item">
+                                    <label className="text-[9px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-1.5 px-1">Display Name</label>
                                     <input
                                         type="text"
-                                        className="w-full px-5 py-3.5 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                        className="w-full px-5 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                         placeholder="Your alias"
                                         value={formData.username}
                                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-2 px-1">Email Address</label>
+                                <div className="anime-item">
+                                    <label className="text-[9px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-1.5 px-1">Email Address</label>
                                     <input
                                         type="email"
-                                        className="w-full px-5 py-3.5 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                        className="w-full px-5 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                         placeholder="name@discussion-forum.com"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     />
                                 </div>
                                 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 anime-item">
                                     <div>
-                                        <label className="text-[10px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-2 px-1">Password</label>
+                                        <label className="text-[9px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-1.5 px-1">Password</label>
                                         <div className="relative">
                                             <input
                                                 type={showPassword ? "text" : "password"}
-                                                className="w-full px-5 py-3.5 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                                 placeholder="••••••••"
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                             />
                                             <span 
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant cursor-pointer hover:text-white transition-colors"
+                                                className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant cursor-pointer hover:text-white transition-colors text-[18px]"
                                             >
                                                 {showPassword ? 'visibility_off' : 'visibility'}
                                             </span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-2 px-1">Confirm</label>
+                                        <label className="text-[9px] font-[800] tracking-[0.1em] uppercase text-on-surface-variant block mb-1.5 px-1">Confirm</label>
                                         <div className="relative">
                                             <input
                                                 type={showConfirmPassword ? "text" : "password"}
-                                                className="w-full px-5 py-3.5 bg-surface-lowest border border-white/5 text-white text-[15px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
+                                                className="w-full px-4 py-2.5 bg-surface-lowest border border-white/5 text-white text-[14px] font-[500] font-mono tracking-widest rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none"
                                                 placeholder="••••••••"
                                                 value={formData.confirmPassword}
                                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                                             />
                                             <span 
                                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant cursor-pointer hover:text-white transition-colors"
+                                                className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant cursor-pointer hover:text-white transition-colors text-[18px]"
                                             >
                                                 {showConfirmPassword ? 'visibility_off' : 'visibility'}
                                             </span>
@@ -220,15 +187,14 @@ export default function Register() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className={`w-full py-4 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-xl cta-glow transform hover:-translate-y-0.5 duration-200 mt-4 cursor-pointer ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    className={`w-full py-3 bg-primary text-[#0b1326] text-[15px] font-[800] rounded-xl cta-glow transform hover:-translate-y-0.5 duration-200 mt-2 cursor-pointer anime-item ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
                                     {loading ? 'Creating Account...' : 'Create Account'}
                                 </button>
                             </form>
-                            
-                            <div className="mt-8 text-center text-[12px] font-[600] tracking-wide text-on-surface-variant">
+                            <div className="mt-6 text-center text-[12px] font-[500] tracking-wide text-on-surface-variant anime-item">
                                 Already joined?{' '}
-                                <Link to="/login" className="text-white hover:text-primary transition-colors uppercase tracking-[0.1em]">Sign In</Link>
+                                <Link to="/login" className="text-white font-[700] hover:text-primary transition-colors hover:underline underline-offset-4 decoration-primary/50">Sign In</Link>
                             </div>
                         </>
                     )}

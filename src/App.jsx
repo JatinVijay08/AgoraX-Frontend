@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthModal from './components/AuthModal';
+import BottomNav from './components/BottomNav';
 import { ToastProvider } from './context/ToastContext';
 import { useAuth } from './context/AuthContext';
 import { authService } from './api/services';
@@ -63,8 +64,10 @@ function App() {
         ) : (
           <>
             {!hideNavbar && <Navbar />}
+            {!hideNavbar && <BottomNav />}
             <AuthModal />
-            <Routes>
+            <div className={!hideNavbar ? "pb-16 md:pb-0" : ""}>
+              <Routes>
               <Route path="/" element={<Navigate to={user ? "/explore" : "/login"} replace />} />
               <Route path="/explore" element={<Home />} />
               <Route path="/login" element={user ? <Navigate to="/explore" replace /> : <Login />} />
@@ -94,7 +97,8 @@ function App() {
                 }
               />
               <Route path="/post/:id" element={<PostDetail />} />
-            </Routes>
+              </Routes>
+            </div>
           </>
         )}
       </div>

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { postService } from '../api/services';
 
 export function usePosts() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -9,7 +11,13 @@ export function usePosts() {
     const [cursor, setCursor] = useState(null);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [activeTab, setActiveTab] = useState('new');
+    
+    // Read activeTab from URL, default to 'new'
+    const activeTab = searchParams.get('sort') || 'new';
+
+    const setActiveTab = (tab) => {
+        setSearchParams({ sort: tab });
+    };
 
     const fetchPosts = async (currentCursor = null, isLoadMore = false) => {
         if (!isLoadMore) { setLoading(true); setError(''); }

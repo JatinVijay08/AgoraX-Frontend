@@ -67,7 +67,7 @@ export default function Home() {
                         </div>
 
                         {/* Sort Tabs and Action */}
-                        <div className="flex flex-wrap items-center justify-between gap-4 mb-10 w-full border-b border-white/5 pb-4">
+                        <div className="hidden md:flex flex-wrap items-center justify-between gap-4 mb-10 w-full border-b border-white/5 pb-4">
                             <div className="flex flex-wrap items-center gap-2">
                                 {tabs.map((tab) => (
                                     <button

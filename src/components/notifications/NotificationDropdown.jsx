@@ -43,7 +43,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     return (
-        <div className="absolute top-12 right-0 w-80 max-h-96 bg-surface-high border border-outline-variant/30 rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
+        <div className="fixed inset-x-0 top-16 mx-auto w-[92vw] max-w-[400px] md:absolute md:inset-auto md:top-12 md:right-0 md:w-80 md:mx-0 max-h-[80vh] md:max-h-96 bg-surface-high border border-outline-variant/30 rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
             <div className="p-4 border-b border-outline-variant/30 bg-surface-highest">
                 <h3 className="font-[700] text-[16px] text-on-surface">Notifications</h3>
             </div>
